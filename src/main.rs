@@ -2,19 +2,6 @@
 #![no_std]
 
 use panic_halt as _;
-// use core::convert::TryInto;
-// use rtic::{app, cyccnt::U32Ext};
-// use stm32l4xx_hal::{
-    // prelude::*,
-// };
-
-// fn monotonic_ticks() -> u32 {
-//     app::monotonics::now()
-//         .duration_since_epoch()
-//         .ticks()
-//         .try_into()
-//         .unwrap()
-// }
 
 #[rtic::app(device = stm32l4xx_hal::stm32,
             dispatchers = [DFSDM1],
@@ -23,6 +10,7 @@ use panic_halt as _;
 ]
 
 mod app {
+    use defmt::export::panic;
     use systick_monotonic::fugit::{Duration, RateExtU32};
     use systick_monotonic::{Systick};
     use stm32l4xx_hal::prelude::_stm32l4_hal_RccExt;
@@ -30,6 +18,7 @@ mod app {
     use stm32l4xx_hal::gpio::PB3;
     use stm32l4xx_hal::flash::FlashExt;
     use stm32l4xx_hal::prelude::_stm32l4_hal_PwrExt;
+    use rtt_target::{rprintln, rtt_init_print};
 
     #[shared]
     struct Shared {
@@ -69,6 +58,8 @@ mod app {
 
         led.set_low();
 
+        rtt_init_print!(); // You may prefer to initialize another way
+
         let mono = Systick::new(cp.SYST, 80_000_000);
 
         // Start the blinky task!
@@ -89,10 +80,10 @@ mod app {
 
         if *flag == false {
             led.set_low();
-            // rprintln!("LED Off");
+            rprintln!("LED OFF");
         } else {
             led.set_high();
-            // rprintln!("LED On");
+            rprintln!("LED ON {}", *flag);
         }
 
         blink_led::spawn_after(Duration::<u64, 1, 1000>::from_ticks(500)).unwrap();

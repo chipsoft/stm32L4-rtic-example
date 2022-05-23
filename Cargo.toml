@@ -13,9 +13,20 @@ embedded-time = "0.12.0"
 systick-monotonic = "1.0.0"
 
 stm32l4xx-hal = { version = "0.7.1", features = ["stm32l432", "rt"]}
-
 panic-halt= "0.2.0"
 cortex-m-rtic = "1.0.0"
+rtt-target = { version = "0.3.1", features = ["cortex-m"] }
+
+defmt = "0.3.0"
+defmt-rtt = "0.3.1"
+panic-probe = { version = "0.3.0", features = ["print-rtt"] }
+
+## Cargo.toml
+#[profile.dev]
+#debug = 1 # default is `true`; not needed if not already overridden
+#
+#[profile.release]
+#debug = 1 # default is `false`; using `true` is also OK as symbols reside on the host, not the target
 
 ## this lets you use `cargo fix`!
 #[[bin]]
@@ -23,33 +34,33 @@ cortex-m-rtic = "1.0.0"
 #test = false
 #bench = false
 
-[profile.dev]
-opt-level = 1
-codegen-units = 16
-debug = true
-lto = false
-
-[profile.release]
-opt-level = "s"     # optimize for size
-codegen-units = 1   # better optimizations
-debug = true        # symbols are nice and they don't increase the size on Flash
-lto = true          # better optimizations
-
-# `syn` and other proc-macro crates take very long to build when optimized
-# this disables optimizations for them reducing the time it takes to build the
-# whole dependency graph by ~80%
-[profile.dev.build-override]
-codegen-units = 16
-debug = false
-debug-assertions = false
-incremental = true
-opt-level = 0
-overflow-checks = false
-
-[profile.release.build-override]
-codegen-units = 16
-debug = false
-debug-assertions = false
-incremental = true
-opt-level = 0
-overflow-checks = false
+#[profile.dev]
+#opt-level = 1
+#codegen-units = 16
+#debug = true
+#lto = false
+#
+#[profile.release]
+#opt-level = "s"     # optimize for size
+#codegen-units = 1   # better optimizations
+#debug = true        # symbols are nice and they don't increase the size on Flash
+#lto = true          # better optimizations
+#
+## `syn` and other proc-macro crates take very long to build when optimized
+## this disables optimizations for them reducing the time it takes to build the
+## whole dependency graph by ~80%
+#[profile.dev.build-override]
+#codegen-units = 16
+#debug = false
+#debug-assertions = false
+#incremental = true
+#opt-level = 0
+#overflow-checks = false
+#
+#[profile.release.build-override]
+#codegen-units = 16
+#debug = false
+#debug-assertions = false
+#incremental = true
+#opt-level = 0
+#overflow-checks = false
