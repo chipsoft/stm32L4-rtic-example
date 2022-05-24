@@ -2,7 +2,6 @@
 #![no_std]
 
 use stm32_project as _;
-// use panic_halt as _;
 
 #[rtic::app(device = stm32l4xx_hal::stm32,
 dispatchers = [DFSDM1],
@@ -11,7 +10,6 @@ peripherals = true,
 ]
 
 mod app {
-    use defmt::export::panic;
     use systick_monotonic::fugit::{Duration, RateExtU32};
     use systick_monotonic::{Systick};
     use stm32l4xx_hal::prelude::_stm32l4_hal_RccExt;
@@ -19,7 +17,6 @@ mod app {
     use stm32l4xx_hal::gpio::PB3;
     use stm32l4xx_hal::flash::FlashExt;
     use stm32l4xx_hal::prelude::_stm32l4_hal_PwrExt;
-    // use rtt_target::{rprintln, rtt_init_print};
 
     #[shared]
     struct Shared {
@@ -56,16 +53,9 @@ mod app {
         let mut led = gpiob
             .pb3
             .into_push_pull_output(&mut gpiob.moder, &mut gpiob.otyper);
-
         led.set_low();
-
-        // rtt_init_print!(); // You may prefer to initialize another way
-
         let mono = Systick::new(cp.SYST, 80_000_000);
-
-        // Start the blinky task!
-        blink_led::spawn().unwrap();
-
+        blink_led::spawn().unwrap(); // Start the blinky task!
         (
             Shared {  },
             Local { led },
@@ -78,7 +68,6 @@ mod app {
         // Extract the LED
         let led = cx.local.led;
         let flag = cx.local.flag;
-
         if *flag == false {
             led.set_low();
             defmt::println!("LED ON");
@@ -86,12 +75,9 @@ mod app {
             led.set_high();
             defmt::println!("LED OFF");
         }
-
         blink_led::spawn_after(Duration::<u64, 1, 1000>::from_ticks(500)).unwrap();
-
         *flag = !*flag;
         // panic!("flag = {}", *flag);
         // assert!(false);
     }
-
 }
