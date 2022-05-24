@@ -1,4 +1,4 @@
-[target.thumbv7m-none-eabi]
+#[target.thumbv7m-none-eabi]
 # uncomment this to make `cargo run` execute programs on QEMU
 # runner = "qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb -nographic -semihosting-config enable=on,target=native -kernel"
 
@@ -12,23 +12,32 @@
 runner = "probe-run --chip STM32L432KCUx"
 
 rustflags = [
-    # LLD (shipped with the Rust toolchain) is used as the default linker
+    "-C", "linker=flip-link",
     "-C", "link-arg=-Tlink.x",
-
-    # if you run into problems with LLD switch to the GNU linker by commenting out
-    # this line
-    # "-C", "linker=arm-none-eabi-ld",
-
-    # if you need to link to pre-compiled C libraries provided by a C toolchain
-    # use GCC as the linker by commenting out both lines above and then
-    # uncommenting the three lines below
-    # "-C", "linker=arm-none-eabi-gcc",
-    # "-C", "link-arg=-Wl,-Tlink.x",
-    # "-C", "link-arg=-nostartfiles",
-
-    # uncomment for unchecked wrapping arithmetics also in dev mode
-    # "-Z", "force-overflow-checks=off",
+    "-C", "link-arg=-Tdefmt.x",
+    # This is needed if your flash or ram addresses are not aligned to 0x10000 in memory.x
+    # See https://github.com/rust-embedded/cortex-m-quickstart/pull/95
+    "-C", "link-arg=--nmagic",
 ]
+
+#rustflags = [
+#    # LLD (shipped with the Rust toolchain) is used as the default linker
+#    "-C", "link-arg=-Tlink.x",
+#
+#    # if you run into problems with LLD switch to the GNU linker by commenting out
+#    # this line
+#    # "-C", "linker=arm-none-eabi-ld",
+#
+#    # if you need to link to pre-compiled C libraries provided by a C toolchain
+#    # use GCC as the linker by commenting out both lines above and then
+#    # uncommenting the three lines below
+#    # "-C", "linker=arm-none-eabi-gcc",
+#    # "-C", "link-arg=-Wl,-Tlink.x",
+#    # "-C", "link-arg=-nostartfiles",
+#
+#    # uncomment for unchecked wrapping arithmetics also in dev mode
+#    # "-Z", "force-overflow-checks=off",
+#]
 
 [build]
 # Pick ONE of these compilation targets

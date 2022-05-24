@@ -1,12 +1,13 @@
 #![no_main]
 #![no_std]
 
-use panic_halt as _;
+use stm32_project as _;
+// use panic_halt as _;
 
 #[rtic::app(device = stm32l4xx_hal::stm32,
-            dispatchers = [DFSDM1],
-            peripherals = true,
-            )
+dispatchers = [DFSDM1],
+peripherals = true,
+)
 ]
 
 mod app {
@@ -18,7 +19,7 @@ mod app {
     use stm32l4xx_hal::gpio::PB3;
     use stm32l4xx_hal::flash::FlashExt;
     use stm32l4xx_hal::prelude::_stm32l4_hal_PwrExt;
-    use rtt_target::{rprintln, rtt_init_print};
+    // use rtt_target::{rprintln, rtt_init_print};
 
     #[shared]
     struct Shared {
@@ -58,7 +59,7 @@ mod app {
 
         led.set_low();
 
-        rtt_init_print!(); // You may prefer to initialize another way
+        // rtt_init_print!(); // You may prefer to initialize another way
 
         let mono = Systick::new(cp.SYST, 80_000_000);
 
@@ -80,15 +81,17 @@ mod app {
 
         if *flag == false {
             led.set_low();
-            rprintln!("LED OFF");
+            defmt::println!("LED ON");
         } else {
             led.set_high();
-            rprintln!("LED ON {}", *flag);
+            defmt::println!("LED OFF");
         }
 
         blink_led::spawn_after(Duration::<u64, 1, 1000>::from_ticks(500)).unwrap();
 
         *flag = !*flag;
+        // panic!("flag = {}", *flag);
+        // assert!(false);
     }
 
 }
